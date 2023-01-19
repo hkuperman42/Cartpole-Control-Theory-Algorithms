@@ -55,8 +55,8 @@ while (abs(j - jOld) > cThresh) && (numIterations < 50)
         newSub(5) = u(i);
 
         %Linearize the dynamics of the system
-        A = vpa(subs(Jx, [xL, dxL, thetaL, dthetaL, uL], newSub), 16);
-        B = vpa(subs(Ju, [xL, dxL, thetaL, dthetaL, uL], newSub), 16);
+        A = double(subs(Jx, [xL, dxL, thetaL, dthetaL, uL], newSub));
+        B = double(subs(Ju, [xL, dxL, thetaL, dthetaL, uL], newSub));
 
         %Generate the control sequence for the current step
         Unified = B.' * S(:, :, i + 1) * B + R;

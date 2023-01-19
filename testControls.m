@@ -1,4 +1,4 @@
-function testControls(constants, Q, R, Sn, x0, numSteps, linState, cThresh, MPCHorizon, MPCSteps, toRun, nameExtension)
+function testControls(constants, Q, R, Sn, x0, numSteps, linState, cThresh, MPCHorizon, MPCSteps, noise, toRun, nameExtension)
 %testControls tests all of the controls using the specified conditions and
 %generates gif animations of their performance
 
@@ -6,6 +6,9 @@ function testControls(constants, Q, R, Sn, x0, numSteps, linState, cThresh, MPCH
 %we run LQR. We do also do this again in ILQR, but I'm too lazy to change
 %it atm
 [Jx, Ju] = getPendulumJacobians(constants);
+
+%For consistancy
+rng('default');
 
 %Check whether we need to run LQR 
 if toRun(1) == 1
@@ -133,8 +136,6 @@ if toRun(3) == 1
 
     %Add the cost for the final state
     j = j + 0.5*x(:, numSteps).'*Sn*x(:, numSteps)
-
-    x
 
     %Animate the cart pole using MPC
     if j < 5000000
