@@ -126,9 +126,7 @@ if toRun(2) == 1
     j = 0;
     for i = 2:numSteps
         %Generate the new optimal control
-        xMeas
         dx = xMeas - xOpt(:, i - 1);
-        dx
         dx(3) = mod((pi + dx(3)), 2*pi) - pi;
         uOpt(i - 1) = uOpt(i - 1) - K(:, :, i - 1)*dx;
     
@@ -176,21 +174,25 @@ if toRun(3) == 1
 
         %Generate the new control policy for this set of steps
         x0 = x(:, l);
-        [K, uOpt] = LQRPendulum(constants, Q, R, Sn, x0, x0, numSteps, Jx, Ju);
+        xMeas = x0 + measNoise(4, l);
+        [K, uOpt] = LQRPendulum(constants, Q, R, Sn, xMeas, xMeas, numSteps, Jx, Ju);
         
         %Simulate the real dynamics of system
         [x1, x2] = size(xOpt);
         numStepsThisIteration = min(MPCSteps, x2);
         for i = 2:(numStepsThisIteration + 1)
             %Generate the control for the next step
-            u(i - 1) = -K(:, :, i - 1)*xMeas;
+            u(i - 1) = -K(:, :, i - 1)*(xMeas);
     
             %Generate the next state of the system using the real dynamics
-            x(:, l + i - 1) = simulateCartPole(constants, x(:, l + i - 2), uOpt(i - 1)) + stateNoise(4, i); 
+            x(:, l + i - 1) = simulateCartPole(constants, x(:, l + i - 2), u(i - 1)) + stateNoise(4, l + i - 2); 
             x(3, l + i - 1) = mod((pi + x(3, l + i - 1)), 2*pi) - pi;
+
+            %Generate noise in the measurements
+            xMeas = x(:, l + i - 1) + measNoise(4, l + i - 2);
     
             %Add the additional cost
-            j = j + 0.5*x(:, l + i - 2).'*Q*x(:, l + i - 2) + 0.5*uOpt(i - 1)*R*uOpt(i - 1);
+            j = j + 0.5*x(:, l + i - 2).'*Q*x(:, l + i - 2) + 0.5*u(i - 1)*R*u(i - 1);
         end
     end
 
@@ -199,9 +201,9 @@ if toRun(3) == 1
 
     %Animate the cart pole using MPC
     if j < 5000000
-        generateAnimationCartPole(constants, numSteps, x, u, "MPC Cartpole" + nameExtension + " (" + round(j) + ").gif");
+        generateAnimationCartPole(constants, numSteps, x, u, "MPCLQR Cartpole" + nameExtension + " (" + round(j) + ").gif");
     else 
-        imwrite(ones(900, 1600, 'double'), "MPC Cartpole" + nameExtension + " (Failed).gif");
+        imwrite(ones(900, 1600, 'double'), "MPCLQR Cartpole" + nameExtension + " (Failed).gif");
     end
 
 
@@ -215,7 +217,7 @@ if toRun(3) == 1
     u = zeros(1, numSteps, 'double');
     x(:, 1) = x0Real;
 
-    %Generate a fake uOopt for the first iteration
+    %Generate a fake uOpt for the first iteration
     uOpt = zeros(1, MPCSteps, 'double');
 
     %Iterate through the horizon, generating a new control policy at
@@ -223,7 +225,7 @@ if toRun(3) == 1
     j = 0;
     for l = 1:MPCSteps:numSteps
         %Determine the length of the horizon in this iteration
-        horizonLength = min(MPCHorizon, numSteps - l - 1);
+        horizonLength = min(MPCHorizon, max(numSteps - l, 2));
 
         %Use the previous control policy (if it exists) as a guess for the
         %next run of ILQR
@@ -233,6 +235,7 @@ if toRun(3) == 1
 
         %Generate the new control policy for this set of steps
         x0 = x(:, l);
+        horizonLength
         [uOpt, xOpt, K] = iLQRPendulum2(constants, Q, R, Sn, x0, cThresh, horizonLength, guessU);
         
         %Simulate the real dynamics of system
@@ -261,8 +264,8 @@ if toRun(3) == 1
 
     %Animate the cart pole using MPC
     if j < 5000000
-        generateAnimationCartPole(constants, numSteps, x, u, "MPC Cartpole" + nameExtension + " (" + round(j) + ").gif");
+        generateAnimationCartPole(constants, numSteps, x, u, "MPCILQR Cartpole" + nameExtension + " (" + round(j) + ").gif");
     else 
-        imwrite(ones(900, 1600, 'double'), "MPC Cartpole" + nameExtension + " (Failed).gif");
+        imwrite(ones(900, 1600, 'double'), "MPCILQR Cartpole" + nameExtension + " (Failed).gif");
     end
 end
