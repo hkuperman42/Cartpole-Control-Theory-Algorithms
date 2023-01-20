@@ -15,7 +15,7 @@ y = radius * sin(theta) + yCenter;
 for k = 1 : length(x)
     row = round(y(k));
     col = round(x(k));
-    if col > 0
+    if col > 0 & col < 1600
         mask(row, col) = 1;
     end
 end

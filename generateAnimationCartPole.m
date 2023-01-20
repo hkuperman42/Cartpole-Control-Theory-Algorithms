@@ -2,18 +2,19 @@ function [I] = generateAnimationCartPole(constants, numSteps, states, u, fileNam
 %generateAnimationPendulum Generates an animation of the cart pole control
 
 %Normalize the position-values of state
-comp = ones(1, numSteps);
+[s1, s2] = size(states);
+comp = ones(1, s2);
 states(1, :) = min(states(1, :), 1.74 * comp);
 states(1, :) = max(states(1, :), -1.74 * comp);
 
 %Determine whether we need to skip frames (due to memory constraints)
-toStep = floor((numSteps - 1) / 200) + 1;
+toStep = floor((s2 - 1) / 200) + 1;
 
 %Preallocate space for the gif
 I = zeros(900, 1600, 1, round(numSteps / toStep), "logical");
 
 %Actually animate the cart
-for i = 1:toStep:numSteps
+for i = 1:toStep:s2
     frame = zeros(900, 1600, "logical");
 
     %Draw the track
@@ -47,7 +48,7 @@ for i = 1:toStep:numSteps
 
     %Draw a force vector
     center = round(states(1, i) * 400) + 800;
-    length = abs(round(u(i) * 2.5));
+    length = abs(round(u(min(i, s1 - 1)) * 2.5));
     if states(2, i) < 0
         frame(465:470, max(1, center - length):center) = 1;
     else 
@@ -61,8 +62,6 @@ for i = 1:toStep:numSteps
     I(:, :, 1, floor((i - 1) / toStep) + 1) = frame;
 end
 
-Image = ones(900, 1600, 1, round(numSteps / toStep)) * 255;
-round(numSteps / toStep)
-toStep
+Image = ones(900, 1600, 1, round(s2 / toStep)) * 255;
 Image(I) = 0;
 imwrite(Image, fileName, "GIF", "DelayTime", constants(5) * toStep);
