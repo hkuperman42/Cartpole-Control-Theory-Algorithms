@@ -50,7 +50,7 @@ while (abs(j - jOld) > cThresh) && (numIterations < 50)
 
     %Complete a backwards pass
     for i = (numSteps - 1) : -1 : 1
-        %Create a vector of variables to substitute
+        %Create a vector of variables to substitute into the jacobeans
         newSub(1:4) = x(:, i);
         newSub(5) = u(i);
 
@@ -88,7 +88,7 @@ while (abs(j - jOld) > cThresh) && (numIterations < 50)
         for i = 2:numSteps
             %Generate the new optimal control
             dx = x(:, i - 1) - xOld(:, i - 1);
-            dx(3) = mod((pi + dx(3)), 2*pi) - pi;
+            dx(3) = mod((pi + dx(3)), 2*pi) - pi; %This is where delta-x comes in from the paper
             u(i - 1) = u(i - 1) + du(i - 1) - KSequence(:, :, i - 1)*dx;
 
             %Generate the next state of the system using the real dynamics

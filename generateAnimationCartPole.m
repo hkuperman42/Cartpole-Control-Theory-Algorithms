@@ -1,13 +1,13 @@
 function [I] = generateAnimationCartPole(constants, numSteps, states, u, fileName)
 %generateAnimationPendulum Generates an animation of the cart pole control
 
-%Normalize the position-values of state
+%Normalize the position-values of state so we don't go off-screen
 [s1, s2] = size(states);
 comp = ones(1, s2);
 states(1, :) = min(states(1, :), 1.74 * comp);
 states(1, :) = max(states(1, :), -1.74 * comp);
 
-%Determine whether we need to skip frames (due to memory constraints)
+%Determine whether we need to skip frames (due to MATLAB writing memory constraints)
 toStep = floor((s2 - 1) / 200) + 1;
 
 %Preallocate space for the gif
@@ -62,6 +62,7 @@ for i = 1:toStep:s2
     I(:, :, 1, floor((i - 1) / toStep) + 1) = frame;
 end
 
+%Comcatenate all frames into one gif
 Image = ones(900, 1600, 1, round(s2 / toStep)) * 255;
 Image(I) = 0;
 imwrite(Image, fileName, "GIF", "DelayTime", constants(5) * toStep);

@@ -35,13 +35,11 @@ for k = numSteps - 1 : -1: 1
     K(:, :, k) = inv(R + Bt * S(:, :, k + 1) * B) * Bt * S(:, :, k + 1) * A;
 end
 
-
-
-%Simulate the real dynamics of system to generate the feed-forward control
 %Reset the initial state of x
 x = zeros(4, numSteps, 'double');
 x(:, 1) = x0;
 
+%Simulate the real dynamics of system to generate the feed-forward-only control
 u = zeros(1, numSteps);
 for i = 2:numSteps
     %Generate the control for the next step

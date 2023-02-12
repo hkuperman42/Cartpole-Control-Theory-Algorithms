@@ -3,11 +3,10 @@ function testControls(constants, Q, R, Sn, x0, numSteps, linState, cThresh, MPCH
 %generates gif animations of their performance
 
 %Generate the Jacobians of the system so we don't have to do it every time
-%we run LQR. We do also do this again in ILQR, but I'm too lazy to change
-%it atm
+%we run LQR
 [Jx, Ju] = getPendulumJacobians(constants);
 
-%For consistancy
+%For consistancy, generate noise beforehand
 rng('default');
 stateNoise = normrnd(0, 1, 4, numSteps) .* repmat(stateNoise.', 1, numSteps);
 measNoise = normrnd(0, 1, 4, numSteps) .* repmat(measNoise.', 1, numSteps);
@@ -17,7 +16,7 @@ if toRun(1) == 1
     %Run LQR on the pendulum system
     [K, uExp] = LQRPendulum(constants, Q, R, Sn, linState, x0, numSteps, Jx, Ju);
 
-    %RUN LQR USING JUST FF
+    %-------APPLY LQR USING JUST FF-------
     %Set the initial state of x
     x = zeros(4, numSteps, 'double');
     x(:, 1) = x0;
@@ -45,7 +44,7 @@ if toRun(1) == 1
     end
 
 
-    %RUN LQR USING THE GAINS MATRIX
+    %-------APPLY LQR USING THE GAINS MATRIX-------
     %Set the initial state of x
     x = zeros(4, numSteps, 'double');
     x(:, 1) = x0;
@@ -87,7 +86,7 @@ if toRun(2) == 1
     %Run ILQR on the pendulum system
     [uOpt, xOpt, K] = iLQRPendulum2(constants, Q, R, Sn, x0, cThresh, numSteps, zeros(numSteps, 1, 'double'));
 
-    %RUN ILQR USING JUST FF
+    %-------APPLY ILQR USING JUST FF-------
     %Reset the initial state of x
     x = zeros(4, numSteps, 'double');
     x(:, 1) = x0;
@@ -116,7 +115,7 @@ if toRun(2) == 1
 
 
 
-    %RUN ILQR USING THE GAINS MATRIX
+    %-------APPLY ILQR USING THE GAINS MATRIX-------
     %Reset the initial state of x
     x = zeros(4, numSteps, 'double');
     x(:, 1) = x0;
@@ -156,7 +155,7 @@ end
 
 %Check whether we need to run MPC
 if toRun(3) == 1
-    %RUN MPC USING LQR
+    %-------RUN MPC USING LQR-------
     %Begin by resetting the initial state of x and creating a variable to hold u 
     x = zeros(4, numSteps, 'double');
     u = zeros(1, numSteps, 'double');
@@ -208,7 +207,7 @@ if toRun(3) == 1
 
 
 
-    %RUN MPC USING ILQR
+    %-------RUN MPC USING ILQR-------
     %Shift the convergence threshold to be more lenient
     cThresh = cThresh * 10;
 

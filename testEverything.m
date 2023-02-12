@@ -37,8 +37,6 @@ testControls(constants, Q, R, Sn, x0, numSteps, [0, 0, pi, 0], cThresh, 30, 1, n
 noise = [0.025, 0.025, 0.025, 0.025];
 testControls(constants, Q, R, Sn, x0, numSteps, [0, 0, pi, 0], cThresh, 30, 1, noise, noise, [1, 1, 1], " High Noise");
 
-
-
 %Change the initial state
 x0 = [0, 0, 0.6, 0];
 testControls(constants, Q, R, Sn, x0, numSteps, [0, 0, 0.6, 0], cThresh, 30, 1, noise, noise, [1, 1, 1], " 0.6lin Control");
@@ -50,9 +48,6 @@ testControls(constants, Q, R, Sn, x0, numSteps, [0, 0, 0.6, 0], cThresh, 30, 1, 
 %Test the controls with high noise
 noise = [0.025, 0.025, 0.025, 0.025];
 testControls(constants, Q, R, Sn, x0, numSteps, [0, 0, 0.6, 0], cThresh, 30, 1, noise, noise, [1, 1, 1], " 0.6lin High Noise");
-
-
-
 
 
 %Vary the starting position
