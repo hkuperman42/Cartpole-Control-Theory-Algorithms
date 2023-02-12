@@ -1,4 +1,4 @@
-function testControls(constants, Q, R, Sn, x0, numSteps, linState, cThresh, MPCHorizon, MPCSteps, stateNoise, measNoise, toRun, nameExtension)
+function testControls(constants, Q, R, Sn, x0, numSteps, linState, cThresh, MPCHorizon, MPCSteps, sig, stateNoise, measNoise, toRun, nameExtension)
 %testControls tests all of the controls using the specified conditions and
 %generates gif animations of their performance
 
@@ -8,8 +8,8 @@ function testControls(constants, Q, R, Sn, x0, numSteps, linState, cThresh, MPCH
 
 %For consistancy, generate noise beforehand
 rng('default');
-stateNoise = normrnd(0, 1, 4, numSteps) .* repmat(stateNoise.', 1, numSteps);
-measNoise = normrnd(0, 1, 4, numSteps) .* repmat(measNoise.', 1, numSteps);
+stateNoise = normrnd(0, sig, 4, numSteps) .* repmat(stateNoise.', 1, numSteps);
+measNoise = normrnd(0, sig, 4, numSteps) .* repmat(measNoise.', 1, numSteps);
 
 %Check if we need to run LQR
 if toRun(1) == 1
